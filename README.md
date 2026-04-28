@@ -8,6 +8,7 @@
 
 - **分享用网页**：`attendance/分享_体育作业打卡.html`  
   浏览器打开即可看表；**有打卡**的格子显示 **🏆**，最后一列是累计次数。
+- **手机访问**：GitHub Pages 开启后可访问 `https://legion0228.github.io/data/`。
 - **原始数据**：按日期一个 JSON：`attendance/YYYY-MM-DD.json`（例如 `2026-04-18.json`）。
 
 网页 **不会**自动联网读钉钉/班级群，只能靠你提供的名单或截图更新 JSON，再生成 HTML。
