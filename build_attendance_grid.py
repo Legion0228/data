@@ -214,6 +214,18 @@ def build_html(roster_names: list[str], days: list[dict]) -> str:
             "</tr>"
         )
 
+    footer_parts = ["build_attendance_grid.py"]
+    if spacer_before_417_index is not None:
+        footer_parts.append("4.16/4.17 间=前四日全勤🚩")
+    if spacer_after_419:
+        footer_parts.append("4.19 后=4.17～4.19 三连🚩")
+    if spacer_after_423:
+        footer_parts.append("4.23 后=4.20～4.23 全勤🚩")
+    if spacer_after_426:
+        footer_parts.append("4.26 后=4.24～4.26 三连🚩")
+    footer_parts.append("html2canvas（CDN）")
+    footer_text = " · ".join(footer_parts)
+
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -448,7 +460,7 @@ def build_html(roster_names: list[str], days: list[dict]) -> str:
       </table>
     </div>
   </div>
-  <p class="footer">build_attendance_grid.py · 4.16/4.17 间=前四日全勤🚩 · 4.19 后=4.17～4.19 三连🚩 · 4.23 后=4.20～4.23 全勤🚩 · 4.26 后=4.24～4.26 三连🚩 · html2canvas（CDN）</p>
+  <p class="footer">{escape(footer_text)}</p>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
   <script>
   (function () {{
