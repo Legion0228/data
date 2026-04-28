@@ -18,6 +18,7 @@ description: >-
 4. 等级录入时禁止猜测：看不清的条目先标记待确认，不得自行推断 A/A+。
 5. 复核通过后再执行：`python3 build_attendance_grid.py`。
 6. 向用户报告：HTML 打卡人数（`len(present)`）与（如有）`app_completed_count` 差异。
+7. 默认只返回生成后的 HTML 路径/本地链接，方便用户自己打开打印或点“生成长图 PNG”；不要生成或返回视频、长图截图，除非用户明确要求。
 
 ## 防失误强制流程（严格执行）
 
@@ -40,6 +41,7 @@ description: >-
 - [ ] 已运行 build_attendance_grid.py
 - [ ] 已抽查 HTML 图标与 JSON 一致
 - [ ] 已说明 HTML 人数与（如有）App 人数
+- [ ] 已返回 HTML 路径/本地链接（默认不返回视频或长图截图）
 ```
 
 ## 不要做
@@ -47,6 +49,7 @@ description: >-
 - 手写 HTML 表体；显示规则以 `build_attendance_grid.py` 为准。
 - 为未映射昵称增加表格行；等映射或保留在 `unmatched_in_app`。
 - 在看不清截图时直接推断 A/A+/B。
+- 用户未明确要求时，不要录制视频或导出长图截图；这会拖慢响应。
 
 ## Additional resources
 
