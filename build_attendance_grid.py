@@ -428,6 +428,44 @@ def build_html(roster_names: list[str], days: list[dict]) -> str:
       background: #dbeafe;
       padding: 4px 0 2px;
     }}
+    @media print {{
+      html, body {{
+        width: max-content;
+        min-width: max-content;
+        margin: 0;
+        padding: 0;
+        background: #dbeafe;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }}
+      .toolbar,
+      .footer {{
+        display: none !important;
+      }}
+      #capture-root {{
+        width: max-content;
+        min-width: max-content;
+        padding: 0;
+      }}
+      .wrap {{
+        overflow: visible !important;
+        max-width: none !important;
+        width: max-content;
+        box-shadow: none;
+      }}
+      table {{
+        width: max-content;
+      }}
+      thead th,
+      .sticky-num,
+      .sticky-name {{
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+        z-index: auto !important;
+        box-shadow: none !important;
+      }}
+    }}
     .footer {{
       text-align: center;
       font-size: 0.65rem;
