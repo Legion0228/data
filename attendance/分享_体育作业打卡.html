@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>作业打卡表（可截图）</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 10px 8px 20px;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #dbeafe;
+      color: #0f172a;
+    }
+    h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 2px;
+      color: #1e3a8a;
+    }
+    .sub {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #1e40af;
+      margin: 0 0 10px;
+    }
+    .hint {
+      text-align: center;
+      font-size: 0.68rem;
+      color: #475569;
+      margin: 0 0 8px;
+    }
+    .wrap {
+      overflow: auto;
+      max-width: 100%;
+      border-radius: 8px;
+      border: 2px solid #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 2px 10px rgba(30, 64, 175, 0.15);
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+      min-width: max-content;
+    }
+    th, td {
+      border: 1px solid #3b82f6;
+      padding: 6px 5px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #93c5fd;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    thead th.sticky-num {
+      left: 0;
+      z-index: 4;
+      min-width: 36px;
+      width: 36px;
+      background: #60a5fa;
+      color: #fff;
+    }
+    thead th.sticky-name {
+      left: 36px;
+      z-index: 4;
+      min-width: 76px;
+      background: #60a5fa;
+      color: #fff;
+    }
+    thead th.day-col {
+      min-width: 32px;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+    th.spacer-col, td.spacer-col {
+      min-width: 24px;
+      width: 24px;
+      padding: 0 2px;
+      background: #dbeafe;
+      border-left: 2px solid #2563eb;
+      border-right: 2px solid #2563eb;
+      text-align: center;
+      font-size: 13px;
+    }
+    thead th.sum-col {
+      min-width: 40px;
+      background: #7dd3fc;
+      color: #0c4a6e;
+    }
+    tbody tr:nth-child(even) {
+      background: #e0f2fe;
+    }
+    tbody tr:nth-child(odd) {
+      background: #f0f9ff;
+    }
+    tbody td.num {
+      font-weight: 600;
+      color: #1e40af;
+    }
+    tbody td.nm {
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+      color: #0f172a;
+    }
+    tbody td.sticky-num {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: inherit;
+    }
+    tbody td.sticky-name {
+      position: sticky;
+      left: 36px;
+      z-index: 1;
+      background: inherit;
+      box-shadow: 2px 0 4px rgba(30, 64, 175, 0.08);
+    }
+    tbody tr:nth-child(even) td.sticky-num,
+    tbody tr:nth-child(even) td.sticky-name {
+      background: #e0f2fe;
+    }
+    tbody tr:nth-child(odd) td.sticky-num,
+    tbody tr:nth-child(odd) td.sticky-name {
+      background: #f0f9ff;
+    }
+    td.ok {
+      font-size: 16px;
+      line-height: 1;
+      padding: 4px 2px;
+    }
+    td.no { color: transparent; }
+    td.sum {
+      font-weight: 700;
+      color: #1e3a8a;
+      background: #bae6fd !important;
+    }
+    tfoot .stats-row td {
+      border-top: 2px solid #1d4ed8;
+      font-weight: 700;
+      font-size: 12px;
+      color: #0c4a6e;
+      background: #7dd3fc;
+    }
+    tfoot .stats-cell {
+      background: #0284c7 !important;
+      color: #fff !important;
+    }
+    tfoot td.sticky-num,
+    tfoot td.sticky-name {
+      position: sticky;
+      z-index: 1;
+      background: #0284c7 !important;
+      box-shadow: 2px 0 4px rgba(8, 47, 73, 0.2);
+    }
+    tfoot td.sticky-num { left: 0; }
+    tfoot td.sticky-name { left: 36px; }
+    tfoot .stats-count {
+      font-variant-numeric: tabular-nums;
+    }
+    tfoot td.tfoot-sum-empty {
+      background: #7dd3fc;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 0 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar button {
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #3b82f6, #2563eb);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+    .toolbar button:hover {
+      filter: brightness(1.05);
+    }
+    .toolbar button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+    #capture-root {
+      background: #dbeafe;
+      padding: 4px 0 2px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.65rem;
+      color: #64748b;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" id="btn-long-png" title="下载整张表为一张 PNG（需联网加载生成库）">生成长图 PNG</button>
+  </div>
+  <div id="capture-root" data-filename="作业打卡表_2026-04-20_至_2026-04-26.png">
+    <h1>作业打卡表</h1>
+    <p class="sub">2026年4月 · 共 7 次记录</p>
+    <p class="hint">序号 · 姓名 · 各日打卡（A+🏅 / A🥈 / B🥉）</p>
+    <div class="wrap" id="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" class="sticky-num">序号</th>
+            <th scope="col" class="sticky-name">姓名</th>
+            <th scope="col" class="day-col" title="4月20日数学作业">4.20</th><th scope="col" class="day-col" title="4月21日数学作业">4.21</th><th scope="col" class="day-col" title="4月22日数学作业">4.22</th><th scope="col" class="day-col" title="4月23日数学作业">4.23</th><th scope="col" class="spacer-col" title="4.20～4.23 均打卡"></th><th scope="col" class="day-col" title="4月24日数学作业">4.24</th><th scope="col" class="day-col" title="4月25日数学作业">4.25</th><th scope="col" class="day-col" title="4月26日数学作业">4.26</th><th scope="col" class="spacer-col" title="4.24～4.26 均打卡"></th>
+            <th scope="col" class="sum-col">累计</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="num sticky-num">1</td><td class="nm sticky-name">曾琝喆</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="ok">🏅</td><td class="spacer-col"></td><td class="sum">4</td></tr><tr><td class="num sticky-num">2</td><td class="nm sticky-name">曾心悦</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">3</td><td class="nm sticky-name">成昊飞</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">4</td><td class="nm sticky-name">陈万希</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">5</td><td class="nm sticky-name">陈语萌</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">6</td><td class="nm sticky-name">丁晨杰</td><td class="ok">🥈</td><td class="ok">🏅</td><td class="no"></td><td class="ok">🥉</td><td class="spacer-col"></td><td class="no"></td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="sum">5</td></tr><tr><td class="num sticky-num">7</td><td class="nm sticky-name">董馨月</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">8</td><td class="nm sticky-name">董怡涵</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="no"></td><td class="spacer-col"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">6</td></tr><tr><td class="num sticky-num">9</td><td class="nm sticky-name">段若彤</td><td class="ok">🥈</td><td class="no"></td><td class="no"></td><td class="ok">🥈</td><td class="spacer-col"></td><td class="no"></td><td class="ok">🥈</td><td class="no"></td><td class="spacer-col"></td><td class="sum">3</td></tr><tr><td class="num sticky-num">10</td><td class="nm sticky-name">杜颢宇</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">11</td><td class="nm sticky-name">范钧澔</td><td class="ok">🥉</td><td class="no"></td><td class="no"></td><td class="ok">🥉</td><td class="spacer-col"></td><td class="no"></td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="sum">4</td></tr><tr><td class="num sticky-num">12</td><td class="nm sticky-name">符怀心</td><td class="ok">🏅</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥈</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">13</td><td class="nm sticky-name">高学成</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">14</td><td class="nm sticky-name">何诗妍</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">15</td><td class="nm sticky-name">何宇榛</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">16</td><td class="nm sticky-name">何治成</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">17</td><td class="nm sticky-name">黄锦馨</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="spacer-col">🚩</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">18</td><td class="nm sticky-name">黄明暄</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="no"></td><td class="no"></td><td class="ok">🏅</td><td class="spacer-col"></td><td class="sum">5</td></tr><tr><td class="num sticky-num">19</td><td class="nm sticky-name">姜陈一</td><td class="no"></td><td class="no"></td><td class="ok">🥉</td><td class="ok">🏅</td><td class="spacer-col"></td><td class="no"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col"></td><td class="sum">4</td></tr><tr><td class="num sticky-num">20</td><td class="nm sticky-name">姜楚涵</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">21</td><td class="nm sticky-name">江天翊</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">22</td><td class="nm sticky-name">贾钰辰</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col">🚩</td><td class="ok">🥈</td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">5</td></tr><tr><td class="num sticky-num">23</td><td class="nm sticky-name">李博文</td><td class="ok">🏅</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">1</td></tr><tr><td class="num sticky-num">24</td><td class="nm sticky-name">李鸿宇</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">25</td><td class="nm sticky-name">李闽朗</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="spacer-col">🚩</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">26</td><td class="nm sticky-name">林越</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">27</td><td class="nm sticky-name">刘辰熙</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">28</td><td class="nm sticky-name">刘梦萱</td><td class="ok">🥉</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">1</td></tr><tr><td class="num sticky-num">29</td><td class="nm sticky-name">刘昱彤</td><td class="ok">🏅</td><td class="no"></td><td class="ok">🏅</td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col"></td><td class="sum">4</td></tr><tr><td class="num sticky-num">30</td><td class="nm sticky-name">刘子骁</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="sum">5</td></tr><tr><td class="num sticky-num">31</td><td class="nm sticky-name">李婉宁</td><td class="no"></td><td class="no"></td><td class="ok">🥈</td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="sum">3</td></tr><tr><td class="num sticky-num">32</td><td class="nm sticky-name">罗悦琪</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">33</td><td class="nm sticky-name">聂子韵</td><td class="ok">🥉</td><td class="ok">🥉</td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">2</td></tr><tr><td class="num sticky-num">34</td><td class="nm sticky-name">帅景瑜</td><td class="no"></td><td class="ok">🥈</td><td class="ok">🏅</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col">🚩</td><td class="sum">6</td></tr><tr><td class="num sticky-num">35</td><td class="nm sticky-name">孙博睿</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="ok">🏅</td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">1</td></tr><tr><td class="num sticky-num">36</td><td class="nm sticky-name">孙紫涵</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">37</td><td class="nm sticky-name">汤雨涵</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">38</td><td class="nm sticky-name">陶梦妍</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">3</td></tr><tr><td class="num sticky-num">39</td><td class="nm sticky-name">王向天</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">40</td><td class="nm sticky-name">王彦骁</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">41</td><td class="nm sticky-name">吴倩雯</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">42</td><td class="nm sticky-name">夏心研</td><td class="ok">🏅</td><td class="ok">🥈</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="no"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col"></td><td class="sum">6</td></tr><tr><td class="num sticky-num">43</td><td class="nm sticky-name">谢泓达</td><td class="no"></td><td class="ok">🏅</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">6</td></tr><tr><td class="num sticky-num">44</td><td class="nm sticky-name">徐梦莹</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">45</td><td class="nm sticky-name">杨宇童</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">46</td><td class="nm sticky-name">俞梓熙</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">47</td><td class="nm sticky-name">张光辰</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="ok">🥈</td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">5</td></tr><tr><td class="num sticky-num">48</td><td class="nm sticky-name">张欣彤</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col">🚩</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col">🚩</td><td class="sum">7</td></tr><tr><td class="num sticky-num">49</td><td class="nm sticky-name">章忆恩</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">–</td></tr><tr><td class="num sticky-num">50</td><td class="nm sticky-name">章宇晨</td><td class="ok">🥉</td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="no"></td><td class="spacer-col"></td><td class="sum">1</td></tr><tr><td class="num sticky-num">51</td><td class="nm sticky-name">周宣志</td><td class="no"></td><td class="no"></td><td class="ok">🥈</td><td class="ok">🥈</td><td class="spacer-col"></td><td class="no"></td><td class="no"></td><td class="ok">🥉</td><td class="spacer-col"></td><td class="sum">3</td></tr><tr><td class="num sticky-num">52</td><td class="nm sticky-name">朱诗语</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="no"></td><td class="spacer-col"></td><td class="ok">🏅</td><td class="ok">🏅</td><td class="ok">🏅</td><td class="spacer-col">🚩</td><td class="sum">6</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="footer">build_attendance_grid.py · 4.16/4.17 间=前四日全勤🚩 · 4.19 后=4.17～4.19 三连🚩 · 4.23 后=4.20～4.23 全勤🚩 · 4.26 后=4.24～4.26 三连🚩 · html2canvas（CDN）</p>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+  <script>
+  (function () {
+    var btn = document.getElementById("btn-long-png");
+    var root = document.getElementById("capture-root");
+    if (!btn || !root) return;
+
+    function stripSticky(doc) {
+      doc.querySelectorAll("thead th, .sticky-num, .sticky-name").forEach(function (el) {
+        el.style.position = "static";
+        el.style.left = "auto";
+        el.style.top = "auto";
+        el.style.zIndex = "auto";
+        el.style.boxShadow = "none";
+      });
+      var w = doc.getElementById("table-wrap");
+      if (w) {
+        w.style.overflow = "visible";
+        w.style.maxWidth = "none";
+      }
+    }
+
+    btn.addEventListener("click", function () {
+      if (typeof html2canvas !== "function") {
+        alert("未加载 html2canvas，请检查网络后刷新页面；或使用 Chrome 开发者工具 → Capture full size screenshot。");
+        return;
+      }
+      btn.disabled = true;
+      var label = btn.textContent;
+      btn.textContent = "生成中…";
+      window.scrollTo(0, 0);
+
+      var fname = root.getAttribute("data-filename") || "作业打卡表.png";
+
+      html2canvas(root, {
+        scale: Math.min(2, (typeof window.devicePixelRatio === "number" ? window.devicePixelRatio : 2)),
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#dbeafe",
+        logging: false,
+        onclone: function (clonedDoc) { stripSticky(clonedDoc); }
+      }).then(function (canvas) {
+        canvas.toBlob(function (blob) {
+          if (!blob) {
+            alert("导出失败：无法生成图片数据。");
+            btn.disabled = false;
+            btn.textContent = label;
+            return;
+          }
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = fname;
+          a.rel = "noopener";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          btn.disabled = false;
+          btn.textContent = label;
+        }, "image/png");
+      }).catch(function (err) {
+        console.error(err);
+        alert("生成长图失败：" + (err && err.message ? err.message : String(err)));
+        btn.disabled = false;
+        btn.textContent = label;
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
